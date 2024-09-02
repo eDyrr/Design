@@ -66,6 +66,7 @@ there is a one-to-many relationship from the user to these items, which can be r
 - a third option is to encods jobs, education, and contact info as a JSON or XML document, store it on a text column in the database, and let the application interpret its structure and content. In this setup, you typically cannot use the database to query for values inside that encoded column.
 
 for data structure like a resume, which is mostly a self-contained *document*, a JSON representation can be quite appropriate.
+###### JSON representation of a resume:
 
 ```
 {
@@ -93,4 +94,13 @@ for data structure like a resume, which is mostly a self-contained *document*, a
 
 the JSON representation has better *locality* than the multi-table schema in the above representation. If you want to fetch a profile in the relational example, you need to either perform multiple queries (query each table by `user_id`) or perform a messy multi-way join between the `users` table and its subordinate tables. In the JSON representation, all the relevant information is in one place, and one query is sufficient.
 
+
+the one-to-many relationships from the user profile to the user's positions, educational history, and contact information imply a tree structure in the data, and the JSON representation makes this tree structure explicit.
+
+![image](figure_2-2_600.png)
+
+### Many-to-One and Many-to-Many Relationships
+
+in the [above](#json-representation-of-a-resume) section, `region_id` and `industry_id` are given as IDs, not as plain-text strings "`Greater Seattle Area`" and "`Philanthropy`". Why?
+if the user interface has free-text fields for entering the region and the industry, it makes sense to store them as plain-text strings. But there are advantages to having standardized lists of geographic regions and industries, and letting users choose from a drop-down list or autocompleter:
 
