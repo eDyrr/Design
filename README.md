@@ -104,3 +104,20 @@ the one-to-many relationships from the user profile to the user's positions, edu
 in the [above](#json-representation-of-a-resume) section, `region_id` and `industry_id` are given as IDs, not as plain-text strings "`Greater Seattle Area`" and "`Philanthropy`". Why?
 if the user interface has free-text fields for entering the region and the industry, it makes sense to store them as plain-text strings. But there are advantages to having standardized lists of geographic regions and industries, and letting users choose from a drop-down list or autocompleter:
 
+- consistent style and spelling across profiles.
+
+- avoiding ambiguity,
+
+- ease of updating-the name is stored in only one place, so its easy to update across the board if it ever needs to be changed.
+
+- localization support-when the site is translated into other languages, the standardized lists can be localized, so the region and industry can be displayed in the viewer's language.
+
+- better search.
+
+whether you store an ID or a text string is a question of duplication. When you use an ID, the information that is meaningful to humans (such as the word *philantrophy*) is stored in only one place, and everything that refers to it uses an ID (which only has meaning within the database). When you store the text directly, you are duplicating the human-meaningful information in every record that uses it.
+
+the advantage of using an ID is that because it has no meaning to humans, it never needs to change: the ID can remain the same, even if the information it identifies changes. Anything that is meaningful to humans may need to change sometime in the future-and if that information is duplicated, all the redundant copies need to be updated. That incurs write overheads, and risks inconsistencies (where some copies of the information are updated but others arent). Removing such duplication is the key idea behing *normalization* in databases.
+
+normalizing this data requires *many-to-one* relationships (many people live in one particular region, many people work in one particular industry), which dont fit nicely into the document model. In relational databases, its normal to refer to rows in other tables by ID, because joins are easy. In document databases, joins are not needed for one-to-many tree structures, and support for joins is often weak.
+
+if the database itself does not support joins, you have to emulate a join in application code by making multiple queries to the database. (In this case, the lists of regions and industries are probably small and slow-changing enough that the application can simply keep them in memory. But nevertheless, the work of making the join is shifted from the database to the application code.)
